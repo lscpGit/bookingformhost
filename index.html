@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sessions Booking Form</title>
+
+  <style>
+    /* Style for the submit button */
+    button[type="submit"] {
+      background-color: #3498db; /* Default color */
+      color: #fff; /* Text color */
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s; /* Transition effect for smooth color change */
+      font-size: 16px; /* Set the font size */
+    }
+  
+    /* Hover effect for the submit button */
+    button[type="submit"]:hover {
+      background-color: #2980b9; /* New color on hover */
+    }
+  </style>
+</head>
+
+  <!-- Include Firebase JavaScript SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore-compat.js"></script>
+
+
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyAEdQwgqpCNkix4Zt2u8NCWn1bg50KZaRA",
+      authDomain: "lscp-database.firebaseapp.com",
+      projectId: "lscp-database",
+      storageBucket: "lscp-database.appspot.com",
+      messagingSenderId: "444036893942",
+      appId: "1:444036893942:web:9a5b5d1fbbcffc6d9af0d7"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
+  </script>
+
+  <form id="booking-form">
+    <label for="name" style="font-size: 18px;" >Name:</label>
+    <input type="text" id="name" name="name" maxlength="50" style="font-size: 15px;" required>
+    <small style="font-size: 15px;" >Maximum 50 characters</small><br><br>
+    
+    <label for="organization" style="font-size: 18px;" >Organisation:</label>
+    <input type="text" id="organization" name="organization" maxlength="50" style="font-size: 15px;" required>
+    <small style="font-size: 15px;">Maximum 50 characters</small><br><br>
+
+    <label for="contact" style="font-size: 18px;" >Contact Number:</label>
+    <input type="tel" id="contact" name="contact" pattern="\d{11}" style="font-size: 15px;" required>
+    <small style="font-size: 15px;">Format: xxxxxxxxxxx</small><br><br>
+    
+    <label for="email" style="font-size: 18px;" >Email:</label>
+    <input type="email" id="email" name="email" maxlength="50" style="font-size: 15px;" required>
+    <small style="font-size: 15px;">Format: abcde@xyz, Maximum 50 characters</small><br><br>
+
+  
+    <!-- Dropdown for session names -->
+    <label for="sessionDropdown" style="font-size: 18px;">Select a Session:</label>
+    <select id="sessionDropdown" name="sessionDropdown" style="font-size: 15px;" required>
+      <option value="">Select a Session</option>
+    </select><br><br>
+
+    <!-- Dropdown for months (initially disabled) -->
+    <label for="monthDropdown" style="font-size: 18px;" >Select a Month:</label>
+    <select id="monthDropdown" name="monthDropdown" style="font-size: 15px;" disabled required>
+      <option value="">Please Select a Month</option>
+      <option value="January">January</option>
+      <option value="February">February</option>
+      <option value="March">March</option>
+      <option value="April">April</option>
+      <option value="May">May</option>
+      <option value="June">June</option>
+      <option value="July">July</option>
+      <option value="August">August</option>
+      <option value="September">September</option>
+      <option value="October">October</option>
+      <option value="November">November</option>
+      <option value="October">October</option>
+      <option value="December">December</option>
+    </select><br><br>
+
+    <!-- Dropdown for times (initially disabled) -->
+    <label for="dateDropdown" style="font-size: 18px;" >Select a Date:</label>
+    <select id="dateDropdown" name="dateDropdown" style="font-size: 15px;" disabled required>
+      <option value="">Select a Date</option>
+    </select><br><br>
+
+    <!-- Dropdown for times (initially disabled) -->
+    <label for="timeDropdown" style="font-size: 18px;">Select a Time:</label>
+    <select id="timeDropdown" name="timeDropdown" style="font-size: 15px;" disabled required>
+      <option value="">Select a Time</option>
+    </select><br><br>
+
+    <!-- Additional name and email fields -->
+    <h2>Add Additional Attendees:</h2>
+    <!-- Repeat the following block for each additional attendee -->
+    <!-- Replace '1' with the appropriate index for each row -->
+    <div class="additional-attendee-row">
+      <label for="additionalName1" style="font-size: 18px;" >Additional Name:</label>
+      <input type="text" id="additionalName1" name="additionalName1" style="font-size: 15px;"><br><br>
+
+      <label for="additionalEmail1" style="font-size: 18px;" >Additional Email:</label>
+      <input type="email" id="additionalEmail1" name="additionalEmail1" style="font-size: 15px;"><br><br>
+
+      <h2></h2>
+      <label for="additionalName2" style="font-size: 18px;" >Additional Name:</label>
+      <input type="text" id="additionalName2" name="additionalName2" style="font-size: 15px;"><br><br>
+
+      <label for="additionalEmail2" style="font-size: 18px;">Additional Email:</label>
+      <input type="email" id="additionalEmail2" name="additionalEmail2" style="font-size: 15px;"><br><br>
+
+      <h2></h2>
+      <label for="additionalName3" style="font-size: 18px;">Additional Name:</label>
+      <input type="text" id="additionalName3" name="additionalName3" style="font-size: 15px;"><br><br>
+
+      <label for="additionalEmail3"style="font-size: 18px;">Additional Email:</label>
+      <input type="email" id="additionalEmail3" name="additionalEmail3" style="font-size: 15px;"><br><br>
+
+      <h2></h2>
+      <label for="additionalName4" style="font-size: 18px;">Additional Name:</label>
+      <input type="text" id="additionalName4" name="additionalName4" style="font-size: 15px;"><br><br>
+
+      <label for="additionalEmail4" style="font-size: 18px;">Additional Email:</label>
+      <input type="email" id="additionalEmail4" name="additionalEmail4" style="font-size: 15px;"><br><br>
+
+      <h2></h2>
+      <label for="additionalName5" style="font-size: 18px;">Additional Name:</label>
+      <input type="text" id="additionalName5" name="additionalName5" style="font-size: 15px;"><br><br>
+
+      <label for="additionalEmail5" style="font-size: 18px;">Additional Email:</label>
+      <input type="email" id="additionalEmail5" name="additionalEmail5" style="font-size: 15px;"><br><br>
+
+      <h2></h2>
+
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+
+  const bookingForm = document.getElementById('booking-form');
+  const sessionDropdown = document.getElementById('sessionDropdown');
+  const monthDropdown = document.getElementById('monthDropdown'); // Add monthDropdown
+  const dateDropdown = document.getElementById('dateDropdown');
+  const timeDropdown = document.getElementById('timeDropdown');
+
+    // Reference to the Firestore collection
+    var collectionRef = db.collection('testAllInsert');
+    var fieldName = 'Session_Name'; 
+
+      // Creating a Set to store unique values
+      var uniqueValues = new Set();
+
+      collectionRef.get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+              var data = doc.data();
+              var fieldValue = data[fieldName];
+              var isBookable = data['Session_Bookable'];
+              var timetable = data['Session_Timetable'];
+
+              // Check if the session is bookable
+              if (isBookable && timetable == "DSPT") {
+                  // Add the value to the Set to ensure uniqueness
+                  //console.log(isBookable + timetable);
+                  uniqueValues.add(fieldValue);
+              }
+          });
+
+          // Convert Set to an array, sort it alphabetically
+          var sortedValues = Array.from(uniqueValues).sort();
+
+          // Populate the dropdown
+          sortedValues.forEach((value) => {
+              var option = document.createElement('option');
+              option.value = value;
+              option.text = value;
+              sessionDropdown.appendChild(option);
+          });
+      }).catch((error) => {
+          console.log("Error getting documents: ", error);
+      });
+
+    // Function to validate email format
+    const isValidEmail = (email) => {
+    const emailRegex = /\S+@\S+\.\S+/;
+    return emailRegex.test(email);
+  };
+
+  // Get current timestamp in BST
+  const now = new Date();
+  const utcOffset = now.getTimezoneOffset();
+  const bstOffset = +120; // BST is UTC+1
+  const bstTimestamp = new Date(now.getTime() + (-60 + bstOffset) * 60000);
+
+      bookingForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Retrieve the name and other details with character limits
+        const name = bookingForm.name.value.trim().substring(0, 50);
+        const organization = bookingForm.organization.value.trim().substring(0, 50);
+        const email = bookingForm.email.value.trim().substring(0, 50);
+        const booking_confirmed_sent = false;
+        const booking_joining_instructions_sent = false;
+        const booking_after_sessions_sent = false;
+        const booking_status = "Ongoing";
+        const booking_printed = false;
+        const booking_contact = bookingForm.contact.value;
+        const booking_timestamp = bstTimestamp;
+
+        // Validate email format
+        if (!isValidEmail(email)) {
+          alert('Please enter a valid email address.');
+          return;
+        }
+
+        // Retrieve the selected session name and date/time
+        const Session_Name = sessionDropdown.value;
+        const Session_Month = monthDropdown.value;
+        const Session_Date = dateDropdown.value;
+        const Session_Time = timeDropdown.value;
+
+        // Build the Session_ID using the extracted elements
+        const Session_ID = Session_Name.split(' ')[0] + '-' + Session_Date + '-' + Session_Time;
+        const main_Booking_ID = Session_ID + '-' + bookingForm.name.value.substring(0, 2) + bookingForm.name.value.substring(bookingForm.name.value.length - 2);
+        console.log('Main ' + main_Booking_ID);
+
+
+        // Additional validation for additional attendees
+        const additionalAttendees = [];
+        for (let i = 1; i <= 5; i++) {
+          const additionalName = bookingForm['additionalName' + i].value.trim().substring(0, 50);
+          const additionalEmail = bookingForm['additionalEmail' + i].value.trim().substring(0, 50);
+          const additionalBooking_ID = Session_ID + '-' + bookingForm['additionalName' + i].value.trim().substring(0, 2) + bookingForm['additionalName' + i].value.trim().substring(bookingForm['additionalName' + i].value.trim().length - 2);
+          console.log('Additional ' + additionalBooking_ID);
+
+
+          // Validate additional email format
+          if (additionalEmail && !isValidEmail(additionalEmail)) {
+            alert(`Please enter a valid email address for additional attendee ${i}.`);
+            return;
+          }
+
+          // If both name and email are provided, add a booking for the additional attendee
+          if (additionalName && additionalEmail) {
+
+            additionalAttendees.push({
+              attendee_name: additionalName,
+              attendee_email: additionalEmail,
+              attendee_organization: organization,
+              session_name: Session_Name,
+              session_date: Session_Date,
+              session_month: Session_Month,
+              session_time: Session_Time,
+              booking_session_ID: Session_ID,
+              booking_confirmed_sent: false,
+              booking_joining_instructions_sent: false,
+              booking_after_sessions_sent: false,
+              booking_status: booking_status,
+              booking_printed: false,
+              booking_last_accessed: null,
+              booking_last_accessed_time: null,
+              booking_lock: false,
+              booking_contact: booking_contact,
+              booking_timestamp: booking_timestamp,
+              booking_ID: additionalBooking_ID
+
+            });
+          }
+        }
+    // Display additional attendees in the confirmation message
+    const additionalAttendeesMessage = additionalAttendees.length > 0
+      ? additionalAttendees.map(att => `Name: ${att.attendee_name}, Email: ${att.attendee_email}`).join('<br><br>')
+      : '';
+
+    Swal.fire({
+        title: 'Please Review Your Details',
+        html: `
+        <style>
+            .custom-swal2-input {
+              font-size: 16px; /* Adjust the font size here */
+            }
+            .custom-swal2-label {
+              font-size: 19px; /* Adjust the font size for labels here */
+            }
+         </style>
+
+         <label>----Your Details----</label>
+        <br><br>
+
+        <label class = "custom-swal2-label" >Name</label>
+        <input type="text" id="name" class="swal2-custom-swal2-input" value="${name}" readonly>
+        <br><br>
+        <label class = "custom-swal2-label" >Email</label>
+        <input type="email" id="email" class="swal2-custom-swal2-input" value="${email}" readonly>
+        <br><br>
+        <label class = "custom-swal2-label" >Contact Number</label>
+        <input type="text" id="Contact_Number" class="swal2-custom-swal2-input" value="${booking_contact}" readonly>
+        <br><br>
+        <label class = "custom-swal2-label" >Organization</label>
+        <input type="email" id="organization" class="swal2-custom-swal2-input" value="${organization}" readonly>
+        <br><br>
+
+        <label>----Session Details----</label>
+        <br><br>
+        
+        <label class = "custom-swal2-label" >Session Name: </label>
+        <input type="text" id="Session_Name" class="swal2-custom-swal2-input" value="${Session_Name}" readonly>
+        <br><br>
+        <label class = "custom-swal2-label" >Session Date</label>
+        <input type="text" id="Session_Date" class="swal2-custom-swal2-input" value="${Session_Date}" readonly>
+        <br><br>
+        <label class = "custom-swal2-label" >Session Time</label>
+        <input type="email" id="Session_Time" class="swal2-custom-swal2-input" value="${Session_Time}" readonly>
+        <br><br>
+
+        <label>----Additional Attendees----</label>
+        <br><br>
+
+        <label class="custom-swal2-label" style="text-align: left; display: block;">
+          ${additionalAttendeesMessage}
+        </label>`,
+
+        confirmButtonText: 'Confirm my details and request booking',
+        cancelButtonText: 'Edit details',
+        showCancelButton: true,
+        focusCancel: true,  // Focus on the "Go Back" button
+        reverseButtons: true, // Show "Go Back" on the left
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Perform the action when "Confirm my details and request booking" is clicked
+          submitBooking (name,email,organization,Session_ID,Session_Name,Session_Date,Session_Month,Session_Time,booking_confirmed_sent,booking_joining_instructions_sent,booking_after_sessions_sent,booking_status,booking_printed,booking_contact,booking_timestamp,main_Booking_ID);
+          Swal.fire('Details Confirmed', 'Your booking request has been sent.', 'success');
+        } else if (result.isDismissed) {
+          // Handle "Go Back" (close the dialog or other behavior)
+          Swal.fire('Go Back', 'You chose to go back and edit your details.', 'info');
+        }
+      });
+
+    async function submitBooking (name,email,organization,Session_ID,Session_Name,Session_Date,Session_Month,Session_Time,booking_confirmed_sent,booking_joining_instructions_sent,booking_after_sessions_sent,booking_status,booking_printed,booking_contact,booking_timestamp,main_Booking_ID){
+      // If the user clicks "Confirm submission"
+      try {
+        // Add data to Firestore Bookings
+        await db.collection('bookings').add({
+          attendee_name: name,
+          attendee_email: email,
+          attendee_organization: organization,
+          booking_session_ID: Session_ID,
+          session_name: Session_Name,
+          session_date: Session_Date,
+          session_month: Session_Month,
+          session_time: Session_Time,
+          booking_confirmed_sent: booking_confirmed_sent,
+          booking_joining_instructions_sent: booking_joining_instructions_sent,
+          booking_after_sessions_sent: booking_after_sessions_sent,
+          booking_status: booking_status,
+          booking_printed: booking_printed,
+          booking_last_accessed: null,
+          booking_last_accessed_time: null,
+          booking_lock: false,
+          booking_contact: booking_contact,
+          booking_timestamp: booking_timestamp,
+          booking_ID: main_Booking_ID
+
+        });
+
+        // Add bookings for additional attendees to Firestore
+        for (const additionalBooking of additionalAttendees) {
+          await db.collection('bookings').add(additionalBooking);
+        }
+
+        // Update the number of attendees in the DSPT Sessions Collection
+        updateSessionCapacity(db, Session_ID, additionalAttendees);
+
+
+        console.log('Booking data added to Firestore');
+        // Clear the form after submission
+        bookingForm.reset();
+      
+      } catch (error) {
+        console.error('Error adding booking data: ', error);
+        // You can add error handling here, like showing an error message
+      }
+    }
+  });
+
+  // Disable the dateDropdown and timeDropdown initially
+  dateDropdown.disabled = true;
+  timeDropdown.disabled = true;
+    
+  // Add event listener to the sessionDropdown
+  sessionDropdown.addEventListener('change', function () {
+
+    // Enable monthDropdown when a session is selected
+    monthDropdown.disabled = false; // Disable monthDropdown initially
+    dateDropdown.disabled = true; // Disable dateDropdown initially
+    timeDropdown.disabled = true; // Disable timeDropdown initially
+
+    updateDropdowns();
+  });
+
+  monthDropdown.addEventListener('change', function () {
+    // Enable dateDropdown when a month is selected
+    dateDropdown.disabled = false;
+    timeDropdown.disabled = true; // Disable timeDropdown initially
+
+    populateDateDropdown(sessionDropdown.value, monthDropdown.value);
+  });
+
+  dateDropdown.addEventListener('change', function () {
+    // Enable timeDropdown when a date is selected
+    timeDropdown.disabled = false;
+
+    populateTimeDropdown(sessionDropdown.value, monthDropdown.value, dateDropdown.value);
+  });
+
+  function updateDropdowns() {
+    var selectedSession = sessionDropdown.value;
+    var selectedMonth = monthDropdown.value;
+
+    // Enable or disable the dateDropdown based on the selected session and month
+    dateDropdown.disabled = selectedSession === '' || selectedMonth === '';
+
+    // Enable or disable the timeDropdown based on the selected session, month, and date
+    timeDropdown.disabled = selectedSession === '' || selectedMonth === '' || dateDropdown.value === '';
+  }
+
+  // Modify the populateDateDropdown function to accept the selectedSession parameter
+  function populateDateDropdown(selectedSession, selectedMonth) {
+    console.log('populateDateDropdown called with session:', selectedSession, 'and month', selectedMonth);
+    // Clear the date dropdown
+    dateDropdown.innerHTML = '<option value="">Select a Date</option>';
+    dateDropdown.disabled = true; // Disable the date dropdown until it's populated
+
+    var query = db.collection('testAllInsert')
+      .where('Session_Name', '==', selectedSession)
+      .where('Session_Month', '==', selectedMonth)
+      .where('Session_Bookable', '==', true)
+      .where('Session_Timetable', '==', 'DSPT'); // Filter to check for DSPT timetable;
+
+    // Enable or disable the dateDropdown based on the selected session
+    if (selectedSession === '' || selectedMonth === '') {
+      dateDropdown.disabled = true;
+    } else {
+      dateDropdown.disabled = false;
+    }
+
+    // Fetch dates based on the selected session, and month from Firestore
+    query.get()
+      .then((querySnapshot) => {
+        if (querySnapshot.empty) {
+          console.log('No matching documents.');
+        } else {
+          console.log('Matching documents:', querySnapshot.size);
+          
+          // Collect the dates into an array
+          const dates = [];
+          querySnapshot.forEach((doc) => {
+            const dateValue = doc.data().Session_Date;
+            if (dateValue) {
+              dates.push(dateValue);
+            }
+          });
+
+          // Sort dates in ascending order
+          dates.sort();
+
+          // Clear and populate the date dropdown with sorted dates
+          dateDropdown.innerHTML = '<option value="">Select a Date</option>';
+          dates.forEach((dateValue) => {
+            const option = document.createElement('option');
+            option.value = dateValue;
+            option.text = dateValue;
+            dateDropdown.appendChild(option);
+          });
+
+          // Enable the date dropdown once it's populated
+          dateDropdown.disabled = false;
+        }
+      })
+      .catch((error) => {
+        console.log('Error getting dates: ', error);
+      });
+
+  }
+
+  // Modify the populateTimeDropdown function to accept the selectedSession, and selectedSessionDate parameters
+  function populateTimeDropdown(selectedSession, selectedMonth, selectedSessionDate) {
+    console.log('populateTimeDropdown called with session: ', selectedSession, 'and month: ', selectedMonth, 'and date', selectedSessionDate);
+    // Clear the time dropdown
+    timeDropdown.innerHTML = '<option value="">Select a Time</option>';
+    timeDropdown.disabled = true; // Disable the time dropdown until it's populated
+
+    var query = db.collection('testAllInsert')
+      .where('Session_Name', '==', selectedSession)
+      .where('Session_Month' , '==', selectedMonth)
+      .where('Session_Date', '==', selectedSessionDate)
+      .where('Session_Bookable', '==', true)
+      .where('Session_Timetable', '==', 'DSPT'); // Filter to check for DSPT timetable;
+
+    // Enable or disable the timeDropdown based on the selected session and date
+    if (selectedSession === '' || selectedSessionDate === '') {
+      timeDropdown.disabled = true;
+    } else {
+      timeDropdown.disabled = false;
+    }
+
+    // Fetch times based on the selected session and date from Firestore
+    query.get()
+      .then((querySnapshot) => {
+        if (querySnapshot.empty) {
+          console.log('No matching documents for times.');
+        } else {
+          console.log('Matching documents for times:', querySnapshot.size);
+          querySnapshot.forEach((doc) => {
+            var timeValue = doc.data().Session_Time;
+            console.log('Time:', timeValue);
+
+            var option = document.createElement('option');
+            option.value = timeValue;
+            option.text = timeValue;
+            timeDropdown.appendChild(option);
+          });
+        }
+      })
+      .catch((error) => {
+        console.log('Error getting times: ', error);
+      });
+  }
+
+
+  // Function to update both dropdowns when a change occurs
+  function updateDropdowns() {
+      var selectedSession = sessionDropdown.value;
+      var selectedSessionDate = dateDropdown.value;
+
+      // Enable or disable the dateDropdown based on the selected session
+      if (selectedSession === '') {
+        dateDropdown.disabled = true;
+      } else {
+        dateDropdown.disabled = false;
+      }
+
+      // Enable or disable the timeDropdown based on the selected session, and date
+      if (selectedSession === '' || selectedSessionDate === '') {
+        timeDropdown.disabled = true;
+      } else {
+        timeDropdown.disabled = false;
+      }
+  }
+
+// Function to update the number of attendees in the specific session
+async function updateSessionCapacity(collectionRef, booking_session_ID, additionalAttendees) {
+  try {
+    // Get the document reference where Session_ID matches booking_session_ID
+    const querySnapshot = await collectionRef.collection('testAllInsert')
+      .where('Session_ID', '==', booking_session_ID)
+      .get();
+
+    // Check if the document exists
+    if (!querySnapshot.empty) {
+      // Assuming Session_ID is unique, there should be only one document in the querySnapshot
+      querySnapshot.forEach(async (doc) => {
+        const docRef = doc.ref;
+        const docData = doc.data();
+
+        // Get the current Session_Capacity value
+        const currentSession_TotalBookings = docData.Session_TotalBookings || 0;
+
+        // Calculate the new capacity
+        const newSession_TotalBookings = currentSession_TotalBookings + additionalAttendees.length + 1;
+
+        // Update the Session_Capacity field in the matched document
+        await docRef.update({
+          Session_TotalBookings: newSession_TotalBookings
+        });
+
+        console.log(`Document with Session_ID: ${booking_session_ID} updated successfully.`);
+      });
+    } else {
+      console.log(`No document found with Session_ID: ${booking_session_ID}`);
+    }
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+}
+
+
+  // Initialize the dropdowns
+  updateDropdowns();
+
+</script>
+</body>
+</html>
+
+<!-- ------------------------------------------------------------------------------------------------------------------- -->
