@@ -35,7 +35,15 @@
 
 
   <script>
-    import firebaseConfig from './firebase-config.js'; // Import the config file
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyAEdQwgqpCNkix4Zt2u8NCWn1bg50KZaRA",
+      authDomain: "lscp-database.firebaseapp.com",
+      projectId: "lscp-database",
+      storageBucket: "lscp-database.appspot.com",
+      messagingSenderId: "444036893942",
+      appId: "1:444036893942:web:9a5b5d1fbbcffc6d9af0d7"
+    };
     
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
@@ -140,10 +148,28 @@
 
     </div>
 
-    <button type="submit">Submit</button>
+    <!-- CAPTCHA -->
+    <p id="captchaQuestion"></p>
+    <p id="captchaMessage" style="font-size: 14px; color: #555;">
+      Please solve this simple math question to verify that you are not a bot. You will be able to submit your booking once done.
+    </p>    <input type="number" id="captchaInput" oninput="validateCaptcha()" required>
+    <br><br>
+
+    <button type="submit" id="submitBtn" disabled>Submit</button>
   </form>
 
   <script>
+  
+  window.onload = function() {
+    generateCaptcha();
+    // Initially disable the submit button and grey it out
+    let submitButton = document.getElementById("submitBtn");
+    let message = document.getElementById("captchaMessage");
+
+    submitButton.disabled = true;
+    submitButton.style.backgroundColor = "#d3d3d3";
+    submitButton.style.cursor = "not-allowed";
+  };
 
   const bookingForm = document.getElementById('booking-form');
   const sessionDropdown = document.getElementById('sessionDropdown');
@@ -151,6 +177,14 @@
   const dateDropdown = document.getElementById('dateDropdown');
   const timeDropdown = document.getElementById('timeDropdown');
 
+  let correctAnswer;
+
+  function generateCaptcha() {
+      let num1 = Math.floor(Math.random() * 10) + 1;
+      let num2 = Math.floor(Math.random() * 10) + 1;
+      correctAnswer = num1 + num2;
+      document.getElementById("captchaQuestion").innerText = `What is ${num1} + ${num2}?`;
+  }
     // Reference to the Firestore collection
     var collectionRef = db.collection('testAllInsert');
     var fieldName = 'Session_Name'; 
@@ -198,6 +232,25 @@
   const utcOffset = now.getTimezoneOffset();
   const bstOffset = +120; // BST is UTC+1
   const bstTimestamp = new Date(now.getTime() + (-60 + bstOffset) * 60000);
+
+  function validateCaptcha() {
+    let userAnswer = document.getElementById("captchaInput").value;
+    let submitButton = document.getElementById("submitBtn");
+    let message = document.getElementById("captchaMessage");
+
+    if (parseInt(userAnswer) === correctAnswer) {
+        submitButton.disabled = false;
+        submitButton.style.backgroundColor = "#007bff";
+        submitButton.style.cursor = "pointer";
+        message.innerText = "You have proved that you are not a robot. The submit button is clickable.";
+
+    } else {
+        submitButton.disabled = true;
+        submitButton.style.backgroundColor = "#d3d3d3";
+        submitButton.style.cursor = "not-allowed";
+        message.innerText = "Please solve this simple math question to verify that you are not a bot. You will be able to submit your booking once done.";
+    }
+  }
 
       bookingForm.addEventListener('submit', async (e) => {
         e.preventDefault();
