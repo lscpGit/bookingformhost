@@ -185,263 +185,291 @@
       correctAnswer = num1 + num2;
       document.getElementById("captchaQuestion").innerText = `What is ${num1} + ${num2}?`;
   }
-    // Reference to the Firestore collection
-    var collectionRef = db.collection('testAllInsert');
-    var fieldName = 'Session_Name'; 
 
-      // Creating a Set to store unique values
-      var uniqueValues = new Set();
+  // Reference to the Firestore collection
+  var collectionRef = db.collection('testAllInsert');
+  var fieldName = 'Session_Name'; 
 
-      collectionRef.get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-              var data = doc.data();
-              var fieldValue = data[fieldName];
-              var isBookable = data['Session_Bookable'];
-              var timetable = data['Session_Timetable'];
+    // Creating a Set to store unique values
+    var uniqueValues = new Set();
 
-              // Check if the session is bookable
-              if (isBookable && timetable == "DSPT") {
-                  // Add the value to the Set to ensure uniqueness
-                  //console.log(isBookable + timetable);
-                  uniqueValues.add(fieldValue);
-              }
-          });
+    collectionRef.get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            var data = doc.data();
+            var fieldValue = data[fieldName];
+            var isBookable = data['Session_Bookable'];
+            var timetable = data['Session_Timetable'];
 
-          // Convert Set to an array, sort it alphabetically
-          var sortedValues = Array.from(uniqueValues).sort();
+            // Check if the session is bookable
+            if (isBookable && timetable == "DSPT") {
+                // Add the value to the Set to ensure uniqueness
+                //console.log(isBookable + timetable);
+                uniqueValues.add(fieldValue);
+            }
+        });
 
-          // Populate the dropdown
-          sortedValues.forEach((value) => {
-              var option = document.createElement('option');
-              option.value = value;
-              option.text = value;
-              sessionDropdown.appendChild(option);
-          });
-      }).catch((error) => {
-          console.log("Error getting documents: ", error);
-      });
+        // Convert Set to an array, sort it alphabetically
+        var sortedValues = Array.from(uniqueValues).sort();
 
-    // Function to validate email format
-    const isValidEmail = (email) => {
-    const emailRegex = /\S+@\S+\.\S+/;
-    return emailRegex.test(email);
-  };
+        // Populate the dropdown
+        sortedValues.forEach((value) => {
+            var option = document.createElement('option');
+            option.value = value;
+            option.text = value;
+            sessionDropdown.appendChild(option);
+        });
+    }).catch((error) => {
+        console.log("Error getting documents: ", error);
+    });
 
-  // Get current timestamp in BST
-  const now = new Date();
-  const utcOffset = now.getTimezoneOffset();
-  const bstOffset = +120; // BST is UTC+1
-  const bstTimestamp = new Date(now.getTime() + (-60 + bstOffset) * 60000);
+  // Function to validate email format
+  const isValidEmail = (email) => {
+  const emailRegex = /\S+@\S+\.\S+/;
+  return emailRegex.test(email);
+};
 
-  function validateCaptcha() {
-    let userAnswer = document.getElementById("captchaInput").value;
-    let submitButton = document.getElementById("submitBtn");
-    let message = document.getElementById("captchaMessage");
+// Get current timestamp in BST
+const now = new Date();
+const utcOffset = now.getTimezoneOffset();
+const bstOffset = +120; // BST is UTC+1
+const bstTimestamp = new Date(now.getTime() + (-60 + bstOffset) * 60000);
 
-    if (parseInt(userAnswer) === correctAnswer) {
-        submitButton.disabled = false;
-        submitButton.style.backgroundColor = "#007bff";
-        submitButton.style.cursor = "pointer";
-        message.innerText = "You have proved that you are not a robot. The submit button is clickable.";
+function validateCaptcha() {
+  let userAnswer = document.getElementById("captchaInput").value;
+  let submitButton = document.getElementById("submitBtn");
+  let message = document.getElementById("captchaMessage");
 
-    } else {
-        submitButton.disabled = true;
-        submitButton.style.backgroundColor = "#d3d3d3";
-        submitButton.style.cursor = "not-allowed";
-        message.innerText = "Please solve this simple math question to verify that you are not a bot. You will be able to submit your booking once done.";
-    }
+  if (parseInt(userAnswer) === correctAnswer) {
+      submitButton.disabled = false;
+      submitButton.style.backgroundColor = "#007bff";
+      submitButton.style.cursor = "pointer";
+      message.innerText = "You have proved that you are not a robot. The submit button is clickable.";
+
+  } else {
+      submitButton.disabled = true;
+      submitButton.style.backgroundColor = "#d3d3d3";
+      submitButton.style.cursor = "not-allowed";
+      message.innerText = "Please solve this simple math question to verify that you are not a bot. You will be able to submit your booking once done.";
   }
+}
 
-      bookingForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    bookingForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-        // Retrieve the name and other details with character limits
-        const name = bookingForm.name.value.trim().substring(0, 50);
-        const organization = bookingForm.organization.value.trim().substring(0, 50);
-        const email = bookingForm.email.value.trim().substring(0, 50);
-        const booking_confirmed_sent = false;
-        const booking_joining_instructions_sent = false;
-        const booking_after_sessions_sent = false;
-        const booking_status = "Ongoing";
-        const booking_printed = false;
-        const booking_contact = bookingForm.contact.value;
-        const booking_timestamp = bstTimestamp;
+      // Retrieve the name and other details with character limits
+      const name = bookingForm.name.value.trim().substring(0, 50);
+      const organization = bookingForm.organization.value.trim().substring(0, 50);
+      const email = bookingForm.email.value.trim().substring(0, 50);
+      const booking_confirmed_sent = false;
+      const booking_joining_instructions_sent = false;
+      const booking_after_sessions_sent = false;
+      const booking_status = "Ongoing";
+      const booking_printed = false;
+      const booking_contact = bookingForm.contact.value;
+      const booking_timestamp = bstTimestamp;
 
-        // Validate email format
-        if (!isValidEmail(email)) {
-          alert('Please enter a valid email address.');
+      // Validate email format
+      if (!isValidEmail(email)) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+
+      // Retrieve the selected session name and date/time
+      const Session_Name = sessionDropdown.value;
+      const Session_Month = monthDropdown.value;
+      const Session_Date = dateDropdown.value;
+      const Session_Time = timeDropdown.value;
+
+      // Build the Session_ID using the extracted elements
+      const Session_ID = Session_Name.split(' ')[0] + '-' + Session_Date + '-' + Session_Time;
+      const main_Booking_ID = Session_ID + '-' + bookingForm.name.value.substring(0, 2) + bookingForm.name.value.substring(bookingForm.name.value.length - 2);
+      console.log('Main ' + main_Booking_ID);
+
+
+      // Additional validation for additional attendees
+      const additionalAttendees = [];
+      for (let i = 1; i <= 5; i++) {
+        const additionalName = bookingForm['additionalName' + i].value.trim().substring(0, 50);
+        const additionalEmail = bookingForm['additionalEmail' + i].value.trim().substring(0, 50);
+        const additionalBooking_ID = Session_ID + '-' + bookingForm['additionalName' + i].value.trim().substring(0, 2) + bookingForm['additionalName' + i].value.trim().substring(bookingForm['additionalName' + i].value.trim().length - 2);
+        console.log('Additional ' + additionalBooking_ID);
+
+
+        // Validate additional email format
+        if (additionalEmail && !isValidEmail(additionalEmail)) {
+          alert(`Please enter a valid email address for additional attendee ${i}.`);
           return;
         }
 
-        // Retrieve the selected session name and date/time
-        const Session_Name = sessionDropdown.value;
-        const Session_Month = monthDropdown.value;
-        const Session_Date = dateDropdown.value;
-        const Session_Time = timeDropdown.value;
+        // If both name and email are provided, add a booking for the additional attendee
+        if (additionalName && additionalEmail) {
 
-        // Build the Session_ID using the extracted elements
-        const Session_ID = Session_Name.split(' ')[0] + '-' + Session_Date + '-' + Session_Time;
-        const main_Booking_ID = Session_ID + '-' + bookingForm.name.value.substring(0, 2) + bookingForm.name.value.substring(bookingForm.name.value.length - 2);
-        console.log('Main ' + main_Booking_ID);
+          additionalAttendees.push({
+            attendee_name: additionalName,
+            attendee_email: additionalEmail,
+            attendee_organization: organization,
+            session_name: Session_Name,
+            session_date: Session_Date,
+            session_month: Session_Month,
+            session_time: Session_Time,
+            booking_session_ID: Session_ID,
+            booking_confirmed_sent: false,
+            booking_joining_instructions_sent: false,
+            booking_after_sessions_sent: false,
+            booking_status: booking_status,
+            booking_printed: false,
+            booking_last_accessed: null,
+            booking_last_accessed_time: null,
+            booking_lock: false,
+            booking_contact: booking_contact,
+            booking_timestamp: booking_timestamp,
+            booking_ID: additionalBooking_ID
 
-
-        // Additional validation for additional attendees
-        const additionalAttendees = [];
-        for (let i = 1; i <= 5; i++) {
-          const additionalName = bookingForm['additionalName' + i].value.trim().substring(0, 50);
-          const additionalEmail = bookingForm['additionalEmail' + i].value.trim().substring(0, 50);
-          const additionalBooking_ID = Session_ID + '-' + bookingForm['additionalName' + i].value.trim().substring(0, 2) + bookingForm['additionalName' + i].value.trim().substring(bookingForm['additionalName' + i].value.trim().length - 2);
-          console.log('Additional ' + additionalBooking_ID);
-
-
-          // Validate additional email format
-          if (additionalEmail && !isValidEmail(additionalEmail)) {
-            alert(`Please enter a valid email address for additional attendee ${i}.`);
-            return;
-          }
-
-          // If both name and email are provided, add a booking for the additional attendee
-          if (additionalName && additionalEmail) {
-
-            additionalAttendees.push({
-              attendee_name: additionalName,
-              attendee_email: additionalEmail,
-              attendee_organization: organization,
-              session_name: Session_Name,
-              session_date: Session_Date,
-              session_month: Session_Month,
-              session_time: Session_Time,
-              booking_session_ID: Session_ID,
-              booking_confirmed_sent: false,
-              booking_joining_instructions_sent: false,
-              booking_after_sessions_sent: false,
-              booking_status: booking_status,
-              booking_printed: false,
-              booking_last_accessed: null,
-              booking_last_accessed_time: null,
-              booking_lock: false,
-              booking_contact: booking_contact,
-              booking_timestamp: booking_timestamp,
-              booking_ID: additionalBooking_ID
-
-            });
-          }
+          });
         }
-    // Display additional attendees in the confirmation message
-    const additionalAttendeesMessage = additionalAttendees.length > 0
-      ? additionalAttendees.map(att => `Name: ${att.attendee_name}, Email: ${att.attendee_email}`).join('<br><br>')
-      : '';
+      }
+  // Display additional attendees in the confirmation message
+  const additionalAttendeesMessage = additionalAttendees.length > 0
+    ? additionalAttendees.map(att => `Name: ${att.attendee_name}, Email: ${att.attendee_email}`).join('<br><br>')
+    : '';
 
-    Swal.fire({
-        title: 'Please Review Your Details',
-        html: `
-        <style>
-            .custom-swal2-input {
-              font-size: 16px; /* Adjust the font size here */
-            }
-            .custom-swal2-label {
-              font-size: 19px; /* Adjust the font size for labels here */
-            }
-         </style>
+  Swal.fire({
+      title: 'Please Review Your Details',
+      html: `
+      <style>
+          .custom-swal2-input {
+            font-size: 16px; /* Adjust the font size here */
+          }
+          .custom-swal2-label {
+            font-size: 19px; /* Adjust the font size for labels here */
+          }
+        </style>
 
-         <label>----Your Details----</label>
-        <br><br>
+        <label>----Your Details----</label>
+      <br><br>
 
-        <label class = "custom-swal2-label" >Name</label>
-        <input type="text" id="name" class="swal2-custom-swal2-input" value="${name}" readonly>
-        <br><br>
-        <label class = "custom-swal2-label" >Email</label>
-        <input type="email" id="email" class="swal2-custom-swal2-input" value="${email}" readonly>
-        <br><br>
-        <label class = "custom-swal2-label" >Contact Number</label>
-        <input type="text" id="Contact_Number" class="swal2-custom-swal2-input" value="${booking_contact}" readonly>
-        <br><br>
-        <label class = "custom-swal2-label" >Organization</label>
-        <input type="email" id="organization" class="swal2-custom-swal2-input" value="${organization}" readonly>
-        <br><br>
+      <label class = "custom-swal2-label" >Name</label>
+      <input type="text" id="name" class="swal2-custom-swal2-input" value="${name}" readonly>
+      <br><br>
+      <label class = "custom-swal2-label" >Email</label>
+      <input type="email" id="email" class="swal2-custom-swal2-input" value="${email}" readonly>
+      <br><br>
+      <label class = "custom-swal2-label" >Contact Number</label>
+      <input type="text" id="Contact_Number" class="swal2-custom-swal2-input" value="${booking_contact}" readonly>
+      <br><br>
+      <label class = "custom-swal2-label" >Organization</label>
+      <input type="email" id="organization" class="swal2-custom-swal2-input" value="${organization}" readonly>
+      <br><br>
 
-        <label>----Session Details----</label>
-        <br><br>
-        
-        <label class = "custom-swal2-label" >Session Name: </label>
-        <input type="text" id="Session_Name" class="swal2-custom-swal2-input" value="${Session_Name}" readonly>
-        <br><br>
-        <label class = "custom-swal2-label" >Session Date</label>
-        <input type="text" id="Session_Date" class="swal2-custom-swal2-input" value="${Session_Date}" readonly>
-        <br><br>
-        <label class = "custom-swal2-label" >Session Time</label>
-        <input type="email" id="Session_Time" class="swal2-custom-swal2-input" value="${Session_Time}" readonly>
-        <br><br>
+      <label>----Session Details----</label>
+      <br><br>
+      
+      <label class = "custom-swal2-label" >Session Name: </label>
+      <input type="text" id="Session_Name" class="swal2-custom-swal2-input" value="${Session_Name}" readonly>
+      <br><br>
+      <label class = "custom-swal2-label" >Session Date</label>
+      <input type="text" id="Session_Date" class="swal2-custom-swal2-input" value="${Session_Date}" readonly>
+      <br><br>
+      <label class = "custom-swal2-label" >Session Time</label>
+      <input type="email" id="Session_Time" class="swal2-custom-swal2-input" value="${Session_Time}" readonly>
+      <br><br>
 
-        <label>----Additional Attendees----</label>
-        <br><br>
+      <label>----Additional Attendees----</label>
+      <br><br>
 
-        <label class="custom-swal2-label" style="text-align: left; display: block;">
-          ${additionalAttendeesMessage}
-        </label>`,
+      <label class="custom-swal2-label" style="text-align: left; display: block;">
+        ${additionalAttendeesMessage}
+      </label>`,
 
-        confirmButtonText: 'Confirm my details and request booking',
-        cancelButtonText: 'Edit details',
-        showCancelButton: true,
-        focusCancel: true,  // Focus on the "Go Back" button
-        reverseButtons: true, // Show "Go Back" on the left
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Perform the action when "Confirm my details and request booking" is clicked
-          submitBooking (name,email,organization,Session_ID,Session_Name,Session_Date,Session_Month,Session_Time,booking_confirmed_sent,booking_joining_instructions_sent,booking_after_sessions_sent,booking_status,booking_printed,booking_contact,booking_timestamp,main_Booking_ID);
-          Swal.fire('Details Confirmed', 'Your booking request has been sent.', 'success');
-        } else if (result.isDismissed) {
-          // Handle "Go Back" (close the dialog or other behavior)
-          Swal.fire('Go Back', 'You chose to go back and edit your details.', 'info');
-        }
+      confirmButtonText: 'Confirm my details and request booking',
+      cancelButtonText: 'Edit details',
+      showCancelButton: true,
+      focusCancel: true,  // Focus on the "Go Back" button
+      reverseButtons: true, // Show "Go Back" on the left
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Perform the action when "Confirm my details and request booking" is clicked
+        submitBooking (name,email,organization,Session_ID,Session_Name,Session_Date,Session_Month,Session_Time,booking_confirmed_sent,booking_joining_instructions_sent,booking_after_sessions_sent,booking_status,booking_printed,booking_contact,booking_timestamp,main_Booking_ID);
+        Swal.fire('Details Confirmed', 'Your booking request has been sent.', 'success');
+      } else if (result.isDismissed) {
+        // Handle "Go Back" (close the dialog or other behavior)
+        Swal.fire('Go Back', 'You chose to go back and edit your details.', 'info');
+      }
+    });
+
+  async function submitBooking (name,email,organization,Session_ID,Session_Name,Session_Date,Session_Month,Session_Time,booking_confirmed_sent,booking_joining_instructions_sent,booking_after_sessions_sent,booking_status,booking_printed,booking_contact,booking_timestamp,main_Booking_ID){
+    // If the user clicks "Confirm submission"
+    try {
+      // Add data to Firestore Bookings
+      await db.collection('bookings').add({
+        attendee_name: name,
+        attendee_email: email,
+        attendee_organization: organization,
+        booking_session_ID: Session_ID,
+        session_name: Session_Name,
+        session_date: Session_Date,
+        session_month: Session_Month,
+        session_time: Session_Time,
+        booking_confirmed_sent: booking_confirmed_sent,
+        booking_joining_instructions_sent: booking_joining_instructions_sent,
+        booking_after_sessions_sent: booking_after_sessions_sent,
+        booking_status: booking_status,
+        booking_printed: booking_printed,
+        booking_last_accessed: null,
+        booking_last_accessed_time: null,
+        booking_lock: false,
+        booking_contact: booking_contact,
+        booking_timestamp: booking_timestamp,
+        booking_ID: main_Booking_ID
+
       });
 
-    async function submitBooking (name,email,organization,Session_ID,Session_Name,Session_Date,Session_Month,Session_Time,booking_confirmed_sent,booking_joining_instructions_sent,booking_after_sessions_sent,booking_status,booking_printed,booking_contact,booking_timestamp,main_Booking_ID){
-      // If the user clicks "Confirm submission"
-      try {
-        // Add data to Firestore Bookings
-        await db.collection('bookings').add({
-          attendee_name: name,
-          attendee_email: email,
-          attendee_organization: organization,
-          booking_session_ID: Session_ID,
-          session_name: Session_Name,
-          session_date: Session_Date,
-          session_month: Session_Month,
-          session_time: Session_Time,
-          booking_confirmed_sent: booking_confirmed_sent,
-          booking_joining_instructions_sent: booking_joining_instructions_sent,
-          booking_after_sessions_sent: booking_after_sessions_sent,
-          booking_status: booking_status,
-          booking_printed: booking_printed,
-          booking_last_accessed: null,
-          booking_last_accessed_time: null,
-          booking_lock: false,
-          booking_contact: booking_contact,
-          booking_timestamp: booking_timestamp,
-          booking_ID: main_Booking_ID
-
-        });
-
-        // Add bookings for additional attendees to Firestore
-        for (const additionalBooking of additionalAttendees) {
-          await db.collection('bookings').add(additionalBooking);
-        }
-
-        // Update the number of attendees in the DSPT Sessions Collection
-        updateSessionCapacity(db, Session_ID, additionalAttendees);
-
-
-        console.log('Booking data added to Firestore');
-        // Clear the form after submission
-        bookingForm.reset();
-      
-      } catch (error) {
-        console.error('Error adding booking data: ', error);
-        // You can add error handling here, like showing an error message
+      // Add bookings for additional attendees to Firestore
+      for (const additionalBooking of additionalAttendees) {
+        await db.collection('bookings').add(additionalBooking);
       }
+
+      // Update the number of attendees in the DSPT Sessions Collection
+      updateSessionCapacity(db, Session_ID, additionalAttendees);
+
+
+      console.log('Booking data added to Firestore');
+      // Clear the form after submission
+      bookingForm.reset();
+
+      const recipient = 'adminsupport@lscpinfo.co.uk, ann@lscpinfo.co.uk';
+      const subject = 'DSPT Booking Notification :  ' + Session_Name;
+      const body = 'Good Morning Mate,\n\n' +
+      'New booking has been made for the session:\n\n' +
+      'Attendee Name :  ' + attendee_name +
+      'Attendee Email:  ' + attendee_email +
+      'Name: ' + Session_Name + 
+      '\n\nSession Date and Time: ' + Session_Date + 
+      ' @ ' + Session_Time + '\n\nDelivery Method: ' +  
+      '\n\nTotal Bookings for this session are now : ' + 
+      '\n\n\nREGISTER:\n\n' + '\n\n\nIf you need any further support, please do not hesitate to contact us.';
+
+      fetch('https://script.google.com/macros/s/AKfycbxh8px8qZwnctS71foamyq4uw2dlalWjkfrEANBpIgfwZU_AIAfJZebu1RU_9MXva9t/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `recipient=${encodeURIComponent(recipient)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      })
+      .then(response => response.text())
+      .then(data => {
+        console.log(data);  // Logs 'Email sent successfully.'
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
+    } catch (error) {
+      console.error('Error adding booking data: ', error);
+      // You can add error handling here, like showing an error message
     }
-  });
+  }
+});
 
   // Disable the dateDropdown and timeDropdown initially
   dateDropdown.disabled = true;
@@ -653,3 +681,4 @@ async function updateSessionCapacity(collectionRef, booking_session_ID, addition
 </html>
 
 <!-- ------------------------------------------------------------------------------------------------------------------- -->
+
