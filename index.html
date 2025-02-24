@@ -437,32 +437,33 @@ function validateCaptcha() {
       // Clear the form after submission
       bookingForm.reset();
 
-      const recipient = 'adminsupport@lscpinfo.co.uk, ann@lscpinfo.co.uk, dspt@lscpinfo.co.uk, jaishan@lscpinfo.co.uk';
+      const recipient = 'adminsupport@lscpinfo.co.uk, ann@lscpinfo.co.uk, marketing@lscpinfo.co.uk, jaishan@lscpinfo.co.uk, dsptlscpinfo.co.uk';
       const subject = 'DSPT Booking Notification :  ' + Session_Name;
-      const body = 'Good Morning Mate,\n\n' +
+      const body = 'Good Morning,\n\n' +
       'New booking has been made for the session:\n\n' +
-      'Attendee Name :  ' + attendee_name +
-      'Attendee Email:  ' + attendee_email +
+      'Attendee Name :  ' + name +
+      'Attendee Email:  ' + email +
       'Name: ' + Session_Name + 
       '\n\nSession Date and Time: ' + Session_Date + 
       ' @ ' + Session_Time + '\n\nDelivery Method: ' +  
       '\n\nTotal Bookings for this session are now : ' + 
       '\n\n\nREGISTER:\n\n' + '\n\n\nIf you need any further support, please do not hesitate to contact us.';
 
-      fetch('https://script.google.com/macros/s/AKfycbxh8px8qZwnctS71foamyq4uw2dlalWjkfrEANBpIgfwZU_AIAfJZebu1RU_9MXva9t/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbwDqy1ZWF7cFDaQZ6VZhVgb_SbyxdHjGBDrqMpkr-vrkZYpW7hXqqfynkx7dxIOqnf2/exec', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `recipient=${encodeURIComponent(recipient)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+        body: `action=send&recipient=${encodeURIComponent(recipient)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
       })
       .then(response => response.text())
       .then(data => {
-        console.log(data);  // Logs 'Email sent successfully.'
+        console.log(data);  // Should log: 'Email sent successfully.'
       })
       .catch(error => {
         console.error('Error:', error);
       });
+
 
     } catch (error) {
       console.error('Error adding booking data: ', error);
