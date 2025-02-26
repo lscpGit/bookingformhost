@@ -437,17 +437,15 @@ function validateCaptcha() {
       // Clear the form after submission
       bookingForm.reset();
 
-      const recipient = 'adminsupport@lscpinfo.co.uk';
-      const subject = 'DSPT Booking Notification :  ' + Session_Name;
+      const recipient = 'adminsupport@lscpinfo.co.uk, ann@lscpinfo.co.uk, marketing@lscpinfo.co.uk, jaishan@lscpinfo.co.uk, dsptlscpinfo.co.uk';
+      const subject = 'DSPT Booking Notification :  ' + Session_ID;
       const body = 'Good Morning,\n\n' +
-      'New booking has been made for the session:\n\n' +
-      'Attendee Name :  ' + name +
-      'Attendee Email:  ' + email +
-      'Name: ' + Session_Name + 
-      '\n\nSession Date and Time: ' + Session_Date + 
-      ' @ ' + Session_Time + '\n\nDelivery Method: ' +  
+      'A New booking has been made for the session:' + Session_ID + '\n' +
+      'Attendee Name :  ' + name + '\n' +
+      'Attendee Email:  ' + email + '\n' +
+      'Organisation: ' + organization + '\n' + 
       '\n\nTotal Bookings for this session are now : ' + 
-      '\n\n\nREGISTER:\n\n' + '\n\n\nIf you need any further support, please do not hesitate to contact us.';
+      '\n\nIf you need any further support, please do not hesitate to contact us.';
 
       fetch('https://script.google.com/macros/s/AKfycbwDqy1ZWF7cFDaQZ6VZhVgb_SbyxdHjGBDrqMpkr-vrkZYpW7hXqqfynkx7dxIOqnf2/exec', {
         method: 'POST',
