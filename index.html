@@ -55,8 +55,8 @@
     <input type="text" id="name" name="name" maxlength="50" style="font-size: 15px;" required>
     <small style="font-size: 15px;" >Maximum 50 characters</small><br><br>
     
-    <label for="organization" style="font-size: 18px;" >Organisation:</label>
-    <input type="text" id="organization" name="organization" maxlength="50" style="font-size: 15px;" required>
+    <label for="organistion" style="font-size: 18px;" >Organisation:</label>
+    <input type="text" id="organisation" name="organisation" maxlength="50" style="font-size: 15px;" required>
     <small style="font-size: 15px;">Maximum 50 characters</small><br><br>
 
     <label for="contact" style="font-size: 18px;" >Contact Number:</label>
@@ -258,7 +258,7 @@ function validateCaptcha() {
 
       // Retrieve the name and other details with character limits
       const name = bookingForm.name.value.trim().substring(0, 50);
-      const organization = bookingForm.organization.value.trim().substring(0, 50);
+      const organisation = bookingForm.organisation.value.trim().substring(0, 50);
       const email = bookingForm.email.value.trim().substring(0, 50);
       const booking_confirmed_sent = false;
       const booking_joining_instructions_sent = false;
@@ -307,7 +307,7 @@ function validateCaptcha() {
           additionalAttendees.push({
             attendee_name: additionalName,
             attendee_email: additionalEmail,
-            attendee_organization: organization,
+            attendee_organisation: organisation,
             session_name: Session_Name,
             session_date: Session_Date,
             session_month: Session_Month,
@@ -357,8 +357,8 @@ function validateCaptcha() {
       <label class = "custom-swal2-label" >Contact Number</label>
       <input type="text" id="Contact_Number" class="swal2-custom-swal2-input" value="${booking_contact}" readonly>
       <br><br>
-      <label class = "custom-swal2-label" >Organization</label>
-      <input type="email" id="organization" class="swal2-custom-swal2-input" value="${organization}" readonly>
+      <label class = "custom-swal2-label" >organisation</label>
+      <input type="email" id="organisation" class="swal2-custom-swal2-input" value="${organisation}" readonly>
       <br><br>
 
       <label>----Session Details----</label>
@@ -389,7 +389,7 @@ function validateCaptcha() {
     }).then((result) => {
       if (result.isConfirmed) {
         // Perform the action when "Confirm my details and request booking" is clicked
-        submitBooking (name,email,organization,Session_ID,Session_Name,Session_Date,Session_Month,Session_Time,booking_confirmed_sent,booking_joining_instructions_sent,booking_after_sessions_sent,booking_status,booking_printed,booking_contact,booking_timestamp,main_Booking_ID);
+        submitBooking (name,email,organisation,Session_ID,Session_Name,Session_Date,Session_Month,Session_Time,booking_confirmed_sent,booking_joining_instructions_sent,booking_after_sessions_sent,booking_status,booking_printed,booking_contact,booking_timestamp,main_Booking_ID);
         Swal.fire('Details Confirmed', 'Your booking request has been sent.', 'success');
       } else if (result.isDismissed) {
         // Handle "Go Back" (close the dialog or other behavior)
@@ -397,14 +397,14 @@ function validateCaptcha() {
       }
     });
 
-  async function submitBooking (name,email,organization,Session_ID,Session_Name,Session_Date,Session_Month,Session_Time,booking_confirmed_sent,booking_joining_instructions_sent,booking_after_sessions_sent,booking_status,booking_printed,booking_contact,booking_timestamp,main_Booking_ID){
+  async function submitBooking (name,email,organisation,Session_ID,Session_Name,Session_Date,Session_Month,Session_Time,booking_confirmed_sent,booking_joining_instructions_sent,booking_after_sessions_sent,booking_status,booking_printed,booking_contact,booking_timestamp,main_Booking_ID){
     // If the user clicks "Confirm submission"
     try {
       // Add data to Firestore Bookings
       await db.collection('bookings').add({
         attendee_name: name,
         attendee_email: email,
-        attendee_organization: organization,
+        attendee_organisation: organisation,
         booking_session_ID: Session_ID,
         session_name: Session_Name,
         session_date: Session_Date,
@@ -443,7 +443,7 @@ function validateCaptcha() {
       'A New booking has been made for the session:' + Session_ID + '\n' +
       'Attendee Name :  ' + name + '\n' +
       'Attendee Email:  ' + email + '\n' +
-      'Organisation: ' + organization + '\n' + 
+      'Organisation: ' + organisation + '\n' + 
       '\n\nTotal Bookings for this session are now : ' + 
       '\n\nIf you need any further support, please do not hesitate to contact us.';
 
