@@ -437,30 +437,37 @@ function validateCaptcha() {
       // Clear the form after submission
       bookingForm.reset();
 
-      const recipient = 'adminsupport@lscpinfo.co.uk, ann@lscpinfo.co.uk, annc@lscpinfo.co.uk, jaishan@lscpinfo.co.uk, dspt@lscpinfo.co.uk';
-      const subject = 'DSPT Booking Notification :  ' + Session_ID;
+      const recipient = 'adminsupport@lscpinfo.co.uk';
+      const subject = 'DSPT Booking Notification : ' + Session_ID;
       const body = 'Good Morning,\n\n' +
-      'A New booking has been made for the session:' + Session_ID + '\n' +
-      'Attendee Name :  ' + name + '\n' +
-      'Attendee Email:  ' + email + '\n' +
-      'Organisation: ' + organisation + '\n' + 
-      '\n\nTotal Bookings for this session are now : ' + 
-      '\n\nIf you need any further support, please do not hesitate to contact us.';
-
-      fetch('https://script.google.com/a/macros/lscpinfo.co.uk/s/AKfycbwTS7aKwJgnhSQIN_WFsd-CyyfuO84VinZ4iLopquDVJbDGGVjb8jVTmuIOFCiBcaQ/exec', {
+        'A New booking has been made for the session: ' + Session_ID + '\n' +
+        'Attendee Name : ' + name + '\n' +
+        'Attendee Email: ' + email + '\n' +
+        'Organisation: ' + organisation + '\n' + 
+        '\n\nTotal Bookings for this session are now: ' + totalBookings + 
+        '\n\nIf you need any further support, please do not hesitate to contact us.';
+      
+      // Prepare the data to be sent as a URL-encoded form
+      const data = new URLSearchParams();
+      data.append('action', 'draft');  // You can change 'draft' to 'send' or 'specificSend'
+      data.append('recipient', recipient);
+      data.append('subject', subject);
+      data.append('body', body);
+      
+      fetch('https://script.google.com/a/macros/lscpinfo.co.uk/s/AKfycbyqEkRDyjRSL7gz5ur6GSWZOpHqGVEh4KOeoADXSPLEfaM0N7fxaz31lF4mbeW50EE/exec', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `action=send&recipient=${encodeURIComponent(recipient)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+        body: data.toString(),  // This converts the URLSearchParams to a query string
       })
-      .then(response => response.text())
-      .then(data => {
-        console.log(data);  // Should log: 'Email sent successfully.'
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);  // Should log: 'Draft created successfully.' or 'Email sent successfully.'
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
 
 
     } catch (error) {
