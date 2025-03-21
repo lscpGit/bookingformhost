@@ -449,25 +449,33 @@ function validateCaptcha() {
       
       // Prepare the data to be sent as a URL-encoded form
       const data = new URLSearchParams();
-      data.append('action', 'draft');  // You can change 'draft' to 'send' or 'specificSend'
+      data.append('action', 'specificSend');  // Set action to 'specificSend' to send the email from a specific sender
       data.append('recipient', recipient);
       data.append('subject', subject);
       data.append('body', body);
       
+      // Assuming that you have a specific sender's email in your logic
+      const senderEmail = 'your-email@example.com'; // Replace with your specific sender's email
+      
+      data.append('sender', senderEmail);
+      
+      // Send the request using fetch with CORS handling
       fetch('https://script.google.com/a/macros/lscpinfo.co.uk/s/AKfycbyqEkRDyjRSL7gz5ur6GSWZOpHqGVEh4KOeoADXSPLEfaM0N7fxaz31lF4mbeW50EE/exec', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: data.toString(),  // This converts the URLSearchParams to a query string
+        body: data.toString(),  // Converts the URLSearchParams to a query string
+        mode: 'cors',  // Enable CORS mode for cross-origin requests
       })
         .then(response => response.json())
         .then(data => {
-          console.log(data);  // Should log: 'Draft created successfully.' or 'Email sent successfully.'
+          console.log(data);  // Log success message, e.g., 'Email sent successfully.'
         })
         .catch(error => {
-          console.error('Error:', error);
+          console.error('Error:', error);  // Log errors
         });
+
 
 
     } catch (error) {
