@@ -439,44 +439,42 @@ function validateCaptcha() {
 
       const recipient = 'adminsupport@lscpinfo.co.uk';
       const subject = 'DSPT Booking Notification : ' + Session_ID;
-      const body = 'Good Morning,\n\n' +
-        'A New booking has been made for the session: ' + Session_ID + '\n' +
-        'Attendee Name : ' + name + '\n' +
-        'Attendee Email: ' + email + '\n' +
-        'Organisation: ' + organisation + '\n' + 
-        '\n\nTotal Bookings for this session are now: ' + totalBookings + 
-        '\n\nIf you need any further support, please do not hesitate to contact us.';
+      const body = `Good Morning,
       
-      // Prepare the data to be sent as a URL-encoded form
-      const data = new URLSearchParams();
-      data.append('action', 'specificSend');  // Set action to 'specificSend' to send the email from a specific sender
-      data.append('recipient', recipient);
-      data.append('subject', subject);
-      data.append('body', body);
+      A New booking has been made for the session: ${Session_ID}
+      Attendee Name: ${name}
+      Attendee Email: ${email}
+      Organisation: ${organisation}
       
-      // Assuming that you have a specific sender's email in your logic
-      const senderEmail = 'your-email@example.com'; // Replace with your specific sender's email
+      Total Bookings for this session are now: ${totalBookings}
       
-      data.append('sender', senderEmail);
+      If you need any further support, please do not hesitate to contact us.`;
       
-      // Send the request using fetch with CORS handling
-      fetch('https://script.google.com/a/macros/lscpinfo.co.uk/s/AKfycbyqEkRDyjRSL7gz5ur6GSWZOpHqGVEh4KOeoADXSPLEfaM0N7fxaz31lF4mbeW50EE/exec', {
+      // ✅ Prepare data as JSON
+      const emailData = {
+        action: 'specificSend', // Specifies sending from a specific sender
+        recipient: recipient,
+        subject: subject,
+        body: body,
+        sender: 'your-email@example.com' // Replace with your sender email
+      };
+      
+      // ✅ Send request using Fetch API
+      fetch('https://script.google.com/macros/s/AKfycbwWFGmHJqRP5qOZGmhPx0hnHF303N0Qccih0uZXd6BVvg9UCEVCyFkJdiPNt7H59Xbj/exec', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',  // Use JSON format
         },
-        body: data.toString(),  // Converts the URLSearchParams to a query string
-        mode: 'cors',  // Enable CORS mode for cross-origin requests
+        body: JSON.stringify(emailData),  // Convert object to JSON string
+        mode: 'cors',  // Ensure CORS handling
       })
-        .then(response => response.json())
+        .then(response => response.json()) // Parse response JSON
         .then(data => {
-          console.log(data);  // Log success message, e.g., 'Email sent successfully.'
+          console.log('Success:', data);
         })
         .catch(error => {
-          console.error('Error:', error);  // Log errors
+          console.error('Error:', error);
         });
-
-
 
     } catch (error) {
       console.error('Error adding booking data: ', error);
