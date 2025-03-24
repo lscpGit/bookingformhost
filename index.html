@@ -448,38 +448,32 @@ function validateCaptcha() {
       
       If you need any further support, please do not hesitate to contact us.`;
       
-      // ✅ Prepare data as JSON
-      const emailData = {
-        action: 'specificSend', // Specifies sending from a specific sender
+      fetch('https://script.google.com/macros/s/AKfycbxYPr-acOAhwLKyoU9aVXIGgB3ZJkE2Ji_TBdBCs2MCd6prXz13AMVNFuwdW_hQD9lA3A/exec', {
+      method: 'POST',
+      body: new URLSearchParams({
+        action: 'send',  // Action to send the email
         recipient: recipient,
         subject: subject,
-        body: body,
-        sender: 'your-email@example.com' // Replace with your sender email
-      };
-      
-      // ✅ Send request using Fetch API
-      fetch('https://script.google.com/macros/s/AKfycbwWFGmHJqRP5qOZGmhPx0hnHF303N0Qccih0uZXd6BVvg9UCEVCyFkJdiPNt7H59Xbj/exec', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',  // Use JSON format
-        },
-        body: JSON.stringify(emailData),  // Convert object to JSON string
-        mode: 'cors',  // Ensure CORS handling
+        body: body
+      }),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
+      .then(response => response.text())
+      .then(result => {
+        console.log(result); // Will log "Email sent successfully!"
       })
-        .then(response => response.json()) // Parse response JSON
-        .then(data => {
-          console.log('Success:', data);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-
-    } catch (error) {
-      console.error('Error adding booking data: ', error);
-      // You can add error handling here, like showing an error message
-    }
-  }
-});
+      .catch(error => {
+        console.error('Error sending email:', error);
+      });
+    
+        } catch (error) {
+          console.error('Error adding booking data: ', error);
+          // You can add error handling here, like showing an error message
+        }
+      }
+    });
 
   // Disable the dateDropdown and timeDropdown initially
   dateDropdown.disabled = true;
